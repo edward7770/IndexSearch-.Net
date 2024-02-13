@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<table border="1" align="center" width="500" cellpadding="0" cellspacing="0">
+    @using (Html.BeginForm("SearchForm", "PhoneBookController", FormMethod.Get))
+    {
+        @Html.ValidationSummary(true);
+        <tr><td>
+          <table align="center" width="300" cellpadding="0" cellspacing="0">
+               <tr><td><p><b>Find a contact:</b><br />@Html.TextBox("SearchBox", 
+                     null, new { @class = "search_box", @id = "search" })</p></td></tr></table>
+        </td></tr>
+        <tr><td>
+          <div id="search_results">@{Html.RenderAction("Search", new { Text = "Empty" });}</div>
+        </td></tr>
+    }
+    @{Html.EndForm();}
+
+    <tr><td><br />
+     <form method="get" action=@Url.Action("Create", "PhoneBook") id="createform" autocomplete="off">
+      <table border="1" align="center">
+       <tr>
+        <td><b>Person:</b></td>
+        <td>
+          @Html.TextBox("Person",
+            null, new { @class = "person_box", @id = "person" })
+        </td>
+       </tr>
+        <tr><td colspan="2"><div id="invalid_person" style="color: red; visibility: hidden">Specify the correct person's name 3-31 characters</div></td></tr>
+        <tr>
+         <td><b>Phone:</b></td>
+         <td>
+           @Html.TextBox("Phone",
+             null, new { @class = "phone_box", @id = "phone" })
+         </td>
+        </tr>
+        <tr><td colspan="2"><div id="invalid_phone" style="color: red; visibility: hidden">Specify the correct phone number e.g. +x(xxx)xxx-xxxx</div></td></tr>
+        <tr><td colspan="2"><input type="button" id="submit_btn" value="Submit>" /></td></tr>
+      </table>
+    </form>
+</td></tr>
+</table>
+
+@section Scripts {
+    <script type="text/javascript">
+        $("#person").on("keyup paste", function () {
+          var person_match = $("#person").val().match(/^[a-zA-Z\.\s]*$/);
+          var is_visible = (person_match == null) && ($("#person").val()) ? "visible" : "hidden";
+          $("#invalid_person").css({ 'visibility': is_visible });
+        });
+
+        $("#phone").on("keyup paste", function () {
+          var is_visible = ($("#phone").val()) && ($("#phone").val().length > 15) ||
+                ($("#phone").val().match(/^[a-zA-Z\.\s]*$/) != null) ? "visible" : "hidden";
+          $("#invalid_phone").css({ 'visibility': is_visible });
+        });
+
+        $("#submit_btn").click(function () {
+            var person_match = $("#person").val().match(/^[a-zA-Z\.\s]*$/);
+            var phone_match = $("#phone").val.length > 0 && $("#phone").val().match(/^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/);
+            var is_invalid_phone = (phone_match == null) || (!$("#phone").val()) || ($("#phone").val().length < 10) ? "visible" : "hidden";
+            var is_invalid_person = (person_match == null) && ($("#person").val()) ? "visible" : "hidden";
+            $("#invalid_phone").css({ 'visibility': is_invalid_phone });
+            if (person_match != null && phone_match != null) $("#createform").submit();
+        });
+
+        $("#search").on("keyup paste", function () {
+            $.ajax({ 
+                type: "GET",
+                url: '@Url.Action("Search","PhoneBook")'+"/?text="+$("#search").val(),
+                dataType: 'html',
+                contentType: 'application/html; charset=utf-8',
+                success: function (content, ajaxObj) {
+                    $("#search_results").html(content);
+                },
+            });
+        })
+    </script>
+}
+

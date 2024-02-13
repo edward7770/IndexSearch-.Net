@@ -1,0 +1,19 @@
+﻿@model List<IndexedSearch.Models.PhoneBookEntry>
+<table border="0" align="center" width="500" cellpadding="0" cellspacing="0">
+    <tr>
+        <td style="text-align: center; background-color: black; color: white; width: 90px"><b>Contact ID</b></td>
+        <td style="text-align: left;   background-color: black; color: white; width: 250px"><b>Contact Name</b></td>
+        <td style="text-align: center; background-color: black; color: white; width: 150px"><b>Phone</b></td>
+    </tr>
+
+    @{ int line_id = 0; string bgcolor = ""; }
+    @foreach (var PhoneBookEntry in Model)
+    {
+        <tr>
+            @{ bgcolor = (line_id++ % 2) == 0 ? "white" : "lightgrey"; }
+            <td style="background-color: @bgcolor; text-align: center; width: 90px">@line_id</td>
+            <td style="background-color: @bgcolor; text-align: left;   width: 250px">@PhoneBookEntry.ContactName</td>
+            <td style="background-color: @bgcolor; text-align: center; width: 150px">@PhoneBookEntry.Phone</td>
+        </tr>
+    }
+</table>
